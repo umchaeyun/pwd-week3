@@ -1,85 +1,64 @@
 /* src/pages/ListPage.jsx */
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import styled from '@emotion/styled';
-import RestaurantList from '../components/RestaurantList';
-import { restaurantAPI } from '../services/api';
-import { ClipLoader } from 'react-spinners';
+import restaurantsData from '../data/restaurants.json'; // 사이트에 올라온 맛집 데이터
 
-const PageContainer = styled.div`
-  padding: 2rem 0;
+const Container = styled.div`
+  padding: 2rem 1rem;
+  max-width: 800px;
+  margin: auto;
 `;
 
-const FilterContainer = styled.div`
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
+const Title = styled.h1`
+  text-align: center;
+  font-size: 2rem;
   margin-bottom: 2rem;
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
 `;
 
-const FilterButton = styled.button`
-  padding: 0.5rem 1rem;
-  border: 2px solid #667eea;
-  background: ${props => props.active ? '#667eea' : 'white'};
-  color: ${props => props.active ? 'white' : '#667eea'};
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.3s;
-  
-  &:hover {
-    background: #667eea;
-    color: white;
-  }
+const RestaurantList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 `;
+
+const RestaurantCard = styled.div`
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  background: white;
+`;
+
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
 
 function ListPage() {
-  const [selectedCategory, setSelectedCategory] = useState('전체');
-  const categories = ['전체', '한식', '중식', '일식', '양식', '아시안', '분식', '카페'];
+  const query = useQuery();
+  const foodQuery = query.get('food');
+  const [restaurants, setRestaurants] = useState([]);
 
-  // React Query로 데이터 가져오기
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['restaurants'],
-    queryFn: restaurantAPI.getRestaurants,
-  });
-
-  if (isLoading) {
-    return (
-      <div className="loading">
-        <ClipLoader color="#667eea" size={50} />
-        <p>맛집 정보를 불러오는 중...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return <div className="error">에러가 발생했습니다: {error.message}</div>;
-  }
-
-  const filteredData = selectedCategory === '전체' 
-    ? data?.data 
-    : data?.data.filter(r => r.category === selectedCategory);
+  useEffect(() => {
+    if (foodQuery) {
+      const filtered = restaurantsData.filter(r => r.food === foodQuery);
+      setRestaurants(filtered);
+    } else {
+      setRestaurants(restaurantsData);
+    }
+  }, [foodQuery]);
 
   return (
-    <PageContainer>
-      <h2>맛집 목록</h2>
-      
-      <FilterContainer>
-        {categories.map(category => (
-          <FilterButton
-            key={category}
-            active={selectedCategory === category}
-            onClick={() => setSelectedCategory(category)}
-          >
-            {category}
-          </FilterButton>
-        ))}
-      </FilterContainer>
-
-      <RestaurantList restaurants={filteredData || []} />
-    </PageContainer>
+    <Container>
+      <Title>{foodQuery ? `${foodQuery} 맛집` : '맛집 리스트'}</Title>
+      <RestaurantList>
+        {restaurants.length > 0 ? restaurants.map((r, idx) => (
+          <RestaurantCard key={idx}>
+            <h3>{r.name}</h3>
+            <p>{r.food} / {r.delivery ? '배달 가능' : '매장 방문'}</p>
+          </RestaurantCard>
+        )) : <p>조건에 맞는 맛집이 없습니다.</p>}
+      </RestaurantList>
+    </Container>
   );
 }
 
