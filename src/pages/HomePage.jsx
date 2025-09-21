@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from '@emotion/styled';
-import { FaMapMarkedAlt, FaUtensils, FaStar, FaDice } from 'react-icons/fa';
+import { FaMapMarkedAlt, FaUtensils, FaStar } from 'react-icons/fa';
 
 const HomeContainer = styled.div`
   text-align: center;
@@ -77,13 +77,6 @@ function HomePage() {
           <FaUtensils />
           <h3>맛집 제보하기</h3>
           <p>새로운 맛집을 알려주세요</p>
-        </Card>
-
-        {/* 🎯 새로 추가된 카드 */}
-        <Card to="/roulette">
-          <FaDice />
-          <h3>랜덤 음식 추천</h3>
-          <p>룰렛을 돌려서 오늘의 음식을 정해보세요!</p>
         </Card>
       </CardGrid>
     </HomeContainer>
