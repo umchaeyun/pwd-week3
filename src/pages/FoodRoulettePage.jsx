@@ -1,15 +1,7 @@
 /* src/pages/FoodRoulettePage.jsx */
 import React, { useState } from 'react';
 import styled from '@emotion/styled';
-
-// 임시 음식 데이터
-const foods = [
-  { name: "김치찌개", category: "한식", rating: 4.5, delivery: true, distance: "500m" },
-  { name: "피자", category: "양식", rating: 4.7, delivery: true, distance: "1km" },
-  { name: "초밥", category: "일식", rating: 4.8, delivery: false, distance: "800m" },
-  { name: "칼국수", category: "한식", rating: 4.2, delivery: true, distance: "600m" },
-  { name: "햄버거", category: "양식", rating: 4.0, delivery: true, distance: "300m" },
-];
+import { Wheel } from 'react-custom-roulette';
 
 const Container = styled.div`
   text-align: center;
@@ -21,7 +13,8 @@ const Title = styled.h1`
   margin-bottom: 2rem;
 `;
 
-const RouletteButton = styled.button`
+const SpinButton = styled.button`
+  margin-top: 2rem;
   background: #667eea;
   color: white;
   padding: 1rem 2rem;
@@ -38,7 +31,7 @@ const RouletteButton = styled.button`
 
 const ResultBox = styled.div`
   margin-top: 2rem;
-  padding: 2rem;
+  padding: 1.5rem;
   border-radius: 12px;
   background: #f7f7f7;
   display: inline-block;
@@ -46,25 +39,55 @@ const ResultBox = styled.div`
 `;
 
 function FoodRoulettePage() {
+  // 메뉴 데이터 (식당 X, 메뉴만!)
+  const menuData = [
+    { option: '김치찌개' },
+    { option: '불고기' },
+    { option: '비빔밥' },
+    { option: '초밥' },
+    { option: '라면' },
+    { option: '햄버거' },
+    { option: '피자' },
+    { option: '치킨' },
+    { option: '칼국수' },
+    { option: '떡볶이' },
+  ];
+
+  const [mustSpin, setMustSpin] = useState(false);
+  const [prizeNumber, setPrizeNumber] = useState(0);
   const [result, setResult] = useState(null);
 
-  const spinRoulette = () => {
-    const randomFood = foods[Math.floor(Math.random() * foods.length)];
-    setResult(randomFood);
+  const handleSpinClick = () => {
+    const newPrizeNumber = Math.floor(Math.random() * menuData.length);
+    setPrizeNumber(newPrizeNumber);
+    setMustSpin(true);
   };
 
   return (
     <Container>
-      <Title>랜덤 음식 룰렛 🎲</Title>
-      <RouletteButton onClick={spinRoulette}>룰렛 돌리기</RouletteButton>
-      
+      <Title>랜덤 음식 룰렛 🎡</Title>
+
+      {/* 룰렛 */}
+      <Wheel
+        mustStartSpinning={mustSpin}
+        prizeNumber={prizeNumber}
+        data={menuData}
+        backgroundColors={['#667eea', '#ff6b6b', '#48bb78', '#f6ad55']}
+        textColors={['#ffffff']}
+        onStopSpinning={() => {
+          setMustSpin(false);
+          setResult(menuData[prizeNumber].option);
+        }}
+      />
+
+      {/* 돌리기 버튼 */}
+      <SpinButton onClick={handleSpinClick}>룰렛 돌리기</SpinButton>
+
+      {/* 결과 */}
       {result && (
         <ResultBox>
-          <h2>{result.name}</h2>
-          <p>카테고리: {result.category}</p>
-          <p>평점: ⭐ {result.rating}</p>
-          <p>배달 가능: {result.delivery ? "가능" : "불가"}</p>
-          <p>거리: {result.distance}</p>
+          <h2>오늘의 추천 메뉴 🍽️</h2>
+          <p style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{result}</p>
         </ResultBox>
       )}
     </Container>
