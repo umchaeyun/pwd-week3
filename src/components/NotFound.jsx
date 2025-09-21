@@ -32,13 +32,13 @@ const HomeLink = styled(Link)`
   color: white;
   border-radius: 8px;
   transition: background 0.3s;
-
+  
   &:hover {
     background: #5a67d8;
   }
 `;
 
-export default function NotFound() {
+function NotFound() {
   return (
     <Container>
       <Icon />
@@ -48,3 +48,5 @@ export default function NotFound() {
     </Container>
   );
 }
+
+export default NotFound;
